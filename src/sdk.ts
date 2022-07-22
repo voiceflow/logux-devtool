@@ -1,4 +1,5 @@
 import { HOST_KEY, SERVICE_KEY } from "./constants";
+import { Version } from "./types";
 
 const actionCreatorFactory =
   (prefix: string) =>
@@ -12,7 +13,14 @@ const actionCreatorFactory =
     });
   };
 
+/**
+ * factory for actions sent by the host window
+ */
 const hostAction = actionCreatorFactory(`@@${HOST_KEY}`);
+
+/**
+ * factory for actions sent by the service worker
+ */
 const serviceAction = actionCreatorFactory(`@@${SERVICE_KEY}`);
 
 /* host actions */
@@ -23,9 +31,5 @@ export const logAdd = hostAction<{ message: AnyAction }>("LOG_ADD");
 
 export const acknowledge = serviceAction("ACKNOWLEDGE");
 
-/* panel actions */
-
-export const addVersion = serviceAction<{
-  id: string;
-  entries: [AnyAction, AnyRecord][];
-}>("ADD_VERSION");
+export const replaceVersions = serviceAction<Version[]>("REPLACE_VERSIONS");
+export const addVersion = serviceAction<Version>("ADD_VERSION");

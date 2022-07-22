@@ -1,5 +1,12 @@
 import { HOST_KEY, PANEL_KEY } from "./constants";
-import { acknowledge, addVersion, logAdd } from "./sdk";
+import { acknowledge, addVersion, logAdd, replaceVersions } from "./sdk";
+import { Version } from "./types";
+
+interface State {
+  versions: Version[];
+}
+
+const state: State = { versions: [] };
 
 let hostPort: chrome.runtime.Port | null = null;
 let panelPort: chrome.runtime.Port | null = null;
@@ -9,12 +16,15 @@ chrome.runtime.onConnect.addListener(function (port) {
     hostPort = port;
     hostPort.onMessage.addListener(function (action: AnyAction) {
       if (logAdd.match(action)) {
-        console.log("adding to log", action.payload.message);
-        panelPort?.postMessage(
-          addVersion({ id: "123", entries: [[action, { who: "knows" }]] })
-        );
+        const version: Version = {
+          id: String(Date.now()),
+          entries: [[action, { who: "knows" }]],
+        };
+
+        state.versions.push(version);
+        panelPort?.postMessage(addVersion(version));
       } else {
-        console.log("unknown");
+        console.warn("unexpected host message");
       }
 
       hostPort?.postMessage(acknowledge());
@@ -22,16 +32,12 @@ chrome.runtime.onConnect.addListener(function (port) {
   } else if (port.name === PANEL_KEY) {
     panelPort = port;
     panelPort.onMessage.addListener(function (action: AnyAction) {
-      console.log("got message from devtool panel");
-      // if (logAdd.match(action)) {
-      //   console.log("adding to log", action.payload.message);
-      // } else {
-      //   console.log("unknown");
-      // }
-      // // console.log(JSON.stringify(msg));
-      // // port.postMessage({ question: "Who's there?" });
-      // // port.postMessage({ question: "abc" });
-      // port.postMessage(acknowledge());
+      console.warn("unexpected panel message");
+
+      panelPort?.postMessage(acknowledge());
     });
+
+    // add all missing versions
+    panelPort.postMessage(replaceVersions(state.versions));
   }
 });
