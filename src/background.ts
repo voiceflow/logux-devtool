@@ -18,7 +18,8 @@ chrome.runtime.onConnect.addListener(function (port) {
       if (logAdd.match(action)) {
         const version: Version = {
           id: String(Date.now()),
-          entries: [[action, { who: "knows" }]],
+          label: new Date().toTimeString().substring(0, 8),
+          entries: [[action.payload.message, { who: "knows" }]],
         };
 
         state.versions.push(version);

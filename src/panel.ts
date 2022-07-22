@@ -61,7 +61,7 @@ const renderEntry = (entry: Entry) => {
     e.preventDefault();
     setActiveEntry(el, entry);
   });
-  el.textContent = JSON.stringify(action);
+  el.textContent = action.type;
 
   return el;
 };
@@ -97,7 +97,7 @@ const renderVersion = (version: Version) => {
     e.preventDefault();
     setActiveVersion(el, version);
   });
-  el.textContent = version.id;
+  el.textContent = version.label;
 
   return el;
 };

@@ -32,6 +32,7 @@ li {
 
 .version {
   color: var(--primary-color);
+  margin: 0 4px;
 }
 
 .version.active {
@@ -45,6 +46,7 @@ li {
 
 .timeline {
   flex: 1;
+  overflow: scroll;
 }
 
 .details {
@@ -57,6 +59,7 @@ li {
   justify-content: center;
   padding: 8px;
   border: 1px solid var(--secondary-color);
+  overflow-x: scroll;
 }
 
 .timeline__entry.active {
