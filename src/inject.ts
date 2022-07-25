@@ -1,18 +1,29 @@
-const hostPort = chrome.runtime.connect({ name: "logux-devtool/host" });
+const HOST_KEY = "logux-devtool/host";
+const LOGUX_EVENT = "logux_message";
 
-document.addEventListener("logux_message", (event) => {
-  const {
-    detail: { action },
-  } = event as CustomEvent<{ action: AnyAction }>;
+/* utils */
 
-  hostPort.postMessage(action);
-});
+const injectScript = (url: string) => {
+  const script = document.createElement("script");
 
-/* inject script */
+  script.setAttribute("type", "module");
+  script.setAttribute("src", url);
 
-const script = document.createElement("script");
+  document.head.appendChild(script);
+};
 
-script.setAttribute("type", "module");
-script.setAttribute("src", chrome.runtime.getURL("scripts/bootstrap.js"));
+const bindPort = (port: chrome.runtime.Port) => {
+  document.addEventListener(LOGUX_EVENT, (event) => {
+    const {
+      detail: { action },
+    } = event as CustomEvent<{ action: AnyAction }>;
 
-document.head.appendChild(script);
+    port.postMessage(action);
+  });
+};
+
+/* main */
+
+bindPort(chrome.runtime.connect({ name: HOST_KEY }));
+
+injectScript(chrome.runtime.getURL("scripts/bootstrap.js"));

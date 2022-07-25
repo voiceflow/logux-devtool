@@ -57,13 +57,15 @@ li {
 }
 
 .details {
+  display: flex;
+  flex-direction: column;
   flex: 2;
   border: 1px solid var(--secondary-color);
+  overflow: hidden;
 }
 
 .timeline__entry {
   display: flex;
-  justify-content: center;
   padding: 8px;
   border: 1px solid var(--secondary-color);
   overflow-x: scroll;
@@ -71,12 +73,37 @@ li {
 
 .timeline__entry.active {
   color: var(--highlight-color);
-  border: 1px solid var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .timeline__entry:hover {
   color: var(--highlight-color);
-  border: 1px solid var(--highlight-color);
+  border-color: var(--highlight-color);
   background-color: var(--secondary-color);
   cursor: pointer;
+}
+
+.tabs__tab {
+  height: 32px;
+  width: 50%;
+  border: 1px solid var(--secondary-color);
+  color: var(--primary-color);
+  background: none;
+}
+
+.tabs__tab.active {
+  color: var(--highlight-color);
+  border-color: var(--primary-color);
+}
+
+.tabs__tab:hover {
+  color: var(--highlight-color);
+  border-color: var(--highlight-color);
+  background-color: var(--secondary-color);
+  cursor: pointer;
+}
+
+.tabs__content {
+  color: var(--highlight-color);
+  overflow-y: scroll;
 }

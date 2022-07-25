@@ -1,4 +1,4 @@
-import { HOST_KEY, SERVICE_KEY } from "./constants";
+import { HOST_KEY, SERVICE_KEY, PANEL_KEY } from "./constants";
 import { Version } from "./types";
 
 const actionCreatorFactory =
@@ -23,10 +23,19 @@ const hostAction = actionCreatorFactory(`@@${HOST_KEY}`);
  */
 const serviceAction = actionCreatorFactory(`@@${SERVICE_KEY}`);
 
+/**
+ * factory for actions sent by the devtool panel
+ */
+const panelAction = actionCreatorFactory(`@@${PANEL_KEY}`);
+
 /* host actions */
 
-export const logAdd = hostAction<{ message: AnyAction }>("LOG_ADD");
-export const replayLog = hostAction<{ actions: AnyAction[] }>("REPLAY_LOG");
+export const logAdd = hostAction<{ tabID: string; message: AnyAction }>(
+  "LOG_ADD"
+);
+export const replayLog = hostAction<{ tabID: string; actions: AnyAction[] }>(
+  "REPLAY_LOG"
+);
 
 /* service actions */
 
@@ -34,3 +43,7 @@ export const acknowledge = serviceAction("ACKNOWLEDGE");
 
 export const replaceVersions = serviceAction<Version[]>("REPLACE_VERSIONS");
 export const addVersion = serviceAction<Version>("ADD_VERSION");
+
+/* panel actions */
+
+export const initPanel = panelAction<{ tabID: string }>("INIT");

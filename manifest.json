@@ -6,7 +6,7 @@
   "minimum_chrome_version": "10.0",
   "devtools_page": "devtool.html",
   "background": {
-    "service_worker": "scripts/background.js",
+    "service_worker": "scripts/background/index.js",
     "type": "module"
   },
   "action": {
@@ -27,5 +27,6 @@
         "scripts/bootstrap.js"
       ]
     }
-  ]
+  ],
+  "permissions": ["tabs"]
 }
