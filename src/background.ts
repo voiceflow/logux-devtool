@@ -1,5 +1,11 @@
 import { HOST_KEY, PANEL_KEY } from "./constants";
-import { acknowledge, addVersion, logAdd, replaceVersions } from "./sdk";
+import {
+  acknowledge,
+  addVersion,
+  logAdd,
+  replaceVersions,
+  replayLog,
+} from "./sdk";
 import { Version } from "./types";
 
 interface State {
@@ -18,8 +24,17 @@ chrome.runtime.onConnect.addListener(function (port) {
       if (logAdd.match(action)) {
         const version: Version = {
           id: String(Date.now()),
-          label: new Date().toTimeString().substring(0, 8),
+          label: new Date().toISOString().split("T")[1],
           entries: [[action.payload.message, { who: "knows" }]],
+        };
+
+        state.versions.push(version);
+        panelPort?.postMessage(addVersion(version));
+      } else if (replayLog.match(action)) {
+        const version: Version = {
+          id: String(Date.now()),
+          label: new Date().toISOString().split("T")[1],
+          entries: action.payload.actions.map((a) => [a, { who: "knows" }]),
         };
 
         state.versions.push(version);

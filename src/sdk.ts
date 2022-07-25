@@ -26,6 +26,7 @@ const serviceAction = actionCreatorFactory(`@@${SERVICE_KEY}`);
 /* host actions */
 
 export const logAdd = hostAction<{ message: AnyAction }>("LOG_ADD");
+export const replayLog = hostAction<{ actions: AnyAction[] }>("REPLAY_LOG");
 
 /* service actions */
 

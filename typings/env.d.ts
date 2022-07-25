@@ -1,6 +1,7 @@
 interface Window {
   __LOGUX_DEVTOOL__: {
     logAdd: (action: AnyAction) => void;
+    replayLog: (actions: AnyAction[]) => void;
   };
 }
 
