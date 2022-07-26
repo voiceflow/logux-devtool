@@ -3,6 +3,10 @@
   --secondary-color: #4a4c50;
   --primary-color: #919191;
   --highlight-color: #eaeaea;
+  --warn-color: #f9dd0e;
+  --good-color: rgba(10, 71, 16, 0.75);
+  --bad-color: rgba(126, 49, 49, 0.75);
+  --info-color: rgba(12, 70, 88, 0.75);
 }
 
 body {
@@ -65,6 +69,7 @@ li {
 }
 
 .timeline__entry {
+  position: relative;
   display: flex;
   padding: 8px;
   border: 1px solid var(--secondary-color);
@@ -74,6 +79,18 @@ li {
 .timeline__entry.active {
   color: var(--highlight-color);
   border-color: var(--primary-color);
+}
+
+.timeline__entry.new::after {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  content: "";
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  background-color: var(--warn-color);
 }
 
 .timeline__entry:hover {
@@ -106,4 +123,26 @@ li {
 .tabs__content {
   color: var(--highlight-color);
   overflow-y: scroll;
+}
+
+.tabs__content .indented {
+  margin-left: 16px;
+}
+
+.tabs__content .added > span {
+  background-color: var(--good-color);
+}
+
+.tabs__content .next {
+  background-color: var(--info-color);
+}
+
+.tabs__content .removed > span,
+.tabs__content .prev {
+  background-color: var(--bad-color);
+  text-decoration: line-through;
+}
+
+.tabs__content .changed {
+  display: inline;
 }

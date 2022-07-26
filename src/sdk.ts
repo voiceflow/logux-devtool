@@ -1,5 +1,5 @@
 import { HOST_KEY, SERVICE_KEY, PANEL_KEY } from "./constants";
-import { Version } from "./types";
+import { Version, Entry } from "./types";
 
 const actionCreatorFactory =
   (prefix: string) =>
@@ -37,12 +37,25 @@ export const replayLog = hostAction<{ tabID: string; actions: AnyAction[] }>(
   "REPLAY_LOG"
 );
 
+export const recordReplay = hostAction<{
+  tabID: string;
+  entries: [AnyAction, AnyRecord][];
+}>("RECORD_REPLAY");
+export const recordDispatch = hostAction<{
+  tabID: string;
+  action: AnyAction;
+  state: AnyRecord;
+}>("RECORD_DISPATCH");
+
 /* service actions */
 
 export const acknowledge = serviceAction("ACKNOWLEDGE");
 
 export const replaceVersions = serviceAction<Version[]>("REPLACE_VERSIONS");
 export const addVersion = serviceAction<Version>("ADD_VERSION");
+export const addEntry = serviceAction<{ versionID: string; entry: Entry }>(
+  "ADD_ENTRY"
+);
 
 /* panel actions */
 

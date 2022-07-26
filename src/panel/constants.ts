@@ -1,6 +1,14 @@
 export enum Class {
   // util
   ACTIVE = "active",
+  NEW = "new",
+
+  // JSON diff
+  INDENTED = "indented",
+  ADDED = "added",
+  REMOVED = "removed",
+  CHANGED = "changed",
+  UNCHANGED = "unchanged",
 
   // components
   HEADER = "header",

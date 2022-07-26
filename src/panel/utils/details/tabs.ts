@@ -48,12 +48,12 @@ const renderTabs = (
   };
 
   const el = document.createElement("nav");
+  const frag = document.createDocumentFragment();
 
   el.classList.add(Class.TABS);
-  el.append(
-    renderTab(DetailsTab.ACTION, action, true),
-    renderTab(DetailsTab.STATE, actionState)
-  );
+  frag.appendChild(renderTab(DetailsTab.ACTION, action, true));
+  frag.appendChild(renderTab(DetailsTab.STATE, actionState));
+  el.appendChild(frag);
 
   return el;
 };

@@ -2,6 +2,7 @@ import { Entry, Version } from "../../types";
 import state from "../state";
 import { Class } from "../constants";
 import { renderDetails, clearDetails } from "./details/index";
+import { createFragment } from "../../utils";
 
 const headerEl = document.querySelector(`.${Class.HEADER}`);
 const timelineEl = document.querySelector(`.${Class.TIMELINE}`);
@@ -58,7 +59,11 @@ const setActiveVersion = (targetEl: HTMLElement, version: Version) => {
   clearActiveVersion();
   state.activeVersion = version;
   targetEl.classList.add(Class.ACTIVE);
-  timelineEl?.replaceChildren(...version.entries.map(renderEntry));
+
+  if (!timelineEl) return;
+
+  timelineEl.replaceChildren(...version.entries.map(renderEntry));
+  timelineEl.scrollTop = timelineEl.scrollHeight;
 };
 
 const renderVersion = (version: Version) => {
@@ -78,5 +83,27 @@ const renderVersion = (version: Version) => {
   return el;
 };
 
-export const appendVersions = (...versions: Version[]) =>
-  headerEl?.append(...versions.map(renderVersion));
+export const appendVersions = (...versions: Version[]) => {
+  versions.forEach((version) => (state.versions[version.id] = version));
+
+  headerEl?.appendChild(createFragment(...versions.map(renderVersion)));
+};
+
+export const appendEntry = (versionID: string, entry: Entry) => {
+  const version = state.versions[versionID];
+  if (version) {
+    version.entries.push(entry);
+  }
+
+  if (state.activeVersion?.id !== versionID) return;
+
+  const entryEl = renderEntry(entry);
+  entryEl.classList.add(Class.NEW);
+  entryEl.addEventListener("mouseleave", () =>
+    entryEl.classList.remove(Class.NEW)
+  );
+
+  timelineEl?.appendChild(entryEl);
+
+  entryEl.scrollIntoView();
+};

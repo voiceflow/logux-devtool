@@ -1,4 +1,5 @@
 import { Entry } from "../../../types";
+import { createFragment } from "../../../utils";
 import { Class } from "../../constants";
 import renderContent from "./content";
 import renderTabs from "./tabs";
@@ -25,5 +26,5 @@ export const renderDetails = (entry: Entry) => {
   const [contentEl, updateContent] = renderContent(action);
   const tabsEl = renderTabs(detailsState, entry, updateContent);
 
-  detailsEl.append(tabsEl, contentEl);
+  detailsEl.appendChild(createFragment(tabsEl, contentEl));
 };
