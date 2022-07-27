@@ -16,7 +16,7 @@ import { Class } from "../../constants";
 
 const NBSP = "\u00A0";
 
-export const stringify = (value: Diffable) =>
+const stringify = (value: Diffable) =>
   JSON.stringify(value, null, NBSP.repeat(4));
 
 const renderArrayDiff = (diff: DiffResult[]) => {

@@ -7,6 +7,7 @@
   --good-color: rgba(10, 71, 16, 0.75);
   --bad-color: rgba(126, 49, 49, 0.75);
   --info-color: rgba(12, 70, 88, 0.75);
+  --med-space: 32px;
 }
 
 body {
@@ -34,6 +35,26 @@ li {
   height: 100%;
 }
 
+/* utils */
+
+.bordered {
+  border: 1px solid var(--secondary-color);
+}
+
+.interactive.active {
+  color: var(--highlight-color);
+  border-color: var(--primary-color);
+}
+
+.interactive:hover {
+  color: var(--highlight-color);
+  border-color: var(--highlight-color);
+  background-color: var(--secondary-color);
+  cursor: pointer;
+}
+
+/* components */
+
 .header {
   padding-bottom: 16px;
   overflow-x: scroll;
@@ -60,25 +81,24 @@ li {
   overflow: scroll;
 }
 
-.details {
-  display: flex;
-  flex-direction: column;
-  flex: 2;
-  border: 1px solid var(--secondary-color);
-  overflow: hidden;
+.timeline__clear {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: var(--med-space);
+  color: var(--primary-color);
+  background-color: var(--bg-color);
+  z-index: 1;
 }
 
 .timeline__entry {
   position: relative;
   display: flex;
-  padding: 8px;
-  border: 1px solid var(--secondary-color);
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0 8px;
+  height: var(--med-space);
   overflow-x: scroll;
-}
-
-.timeline__entry.active {
-  color: var(--highlight-color);
-  border-color: var(--primary-color);
 }
 
 .timeline__entry.new::after {
@@ -93,31 +113,18 @@ li {
   background-color: var(--warn-color);
 }
 
-.timeline__entry:hover {
-  color: var(--highlight-color);
-  border-color: var(--highlight-color);
-  background-color: var(--secondary-color);
-  cursor: pointer;
+.details {
+  display: flex;
+  flex-direction: column;
+  flex: 2;
+  overflow: hidden;
 }
 
 .tabs__tab {
-  height: 32px;
+  height: var(--med-space);
   width: 50%;
-  border: 1px solid var(--secondary-color);
   color: var(--primary-color);
   background: none;
-}
-
-.tabs__tab.active {
-  color: var(--highlight-color);
-  border-color: var(--primary-color);
-}
-
-.tabs__tab:hover {
-  color: var(--highlight-color);
-  border-color: var(--highlight-color);
-  background-color: var(--secondary-color);
-  cursor: pointer;
 }
 
 .tabs__content {

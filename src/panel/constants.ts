@@ -1,5 +1,7 @@
 export enum Class {
   // util
+  BORDERED = "bordered",
+  INTERACTIVE = "interactive",
   ACTIVE = "active",
   NEW = "new",
 
@@ -19,7 +21,9 @@ export enum Class {
 
   // timeline
   TIMELINE = "timeline",
+  TIMELINE__CLEAR = "timeline__clear",
   TIMELINE__ENTRY = "timeline__entry",
+  TIMELINE__ENTRY_LIST = "timeline__entry-list",
 
   // tabs
   TABS = "tabs",

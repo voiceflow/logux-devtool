@@ -32,7 +32,7 @@ const setActiveEntry = (targetEl: HTMLElement, entry: Entry) => {
 const renderEntry = (entry: Entry) => {
   const [action] = entry;
   const el = createElement("li", {
-    classes: [Class.TIMELINE__ENTRY],
+    classes: [Class.TIMELINE__ENTRY, Class.BORDERED, Class.INTERACTIVE],
     listeners: {
       click: (e) => {
         e.preventDefault();
@@ -64,7 +64,21 @@ const setActiveVersion = (targetEl: HTMLElement, version: Version) => {
 
   if (!timelineEl) return;
 
-  timelineEl.replaceChildren(...version.entries.map(renderEntry));
+  const entryListEl = createElement("div", {
+    classes: [Class.TIMELINE__ENTRY_LIST],
+    children: version.entries.map(renderEntry),
+  });
+
+  timelineEl.replaceChildren(
+    createElement("button", {
+      classes: [Class.TIMELINE__CLEAR, Class.BORDERED, Class.INTERACTIVE],
+      text: "CLEAR",
+      listeners: {
+        click: () => entryListEl.replaceChildren(),
+      },
+    }),
+    entryListEl
+  );
   timelineEl.scrollTop = timelineEl.scrollHeight;
 };
 
