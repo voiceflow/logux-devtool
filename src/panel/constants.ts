@@ -4,6 +4,7 @@ export enum Class {
   INTERACTIVE = "interactive",
   ACTIVE = "active",
   NEW = "new",
+  BLAME = "blame",
 
   // JSON diff
   INDENTED = "indented",

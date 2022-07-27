@@ -8,7 +8,7 @@ import {
   replaceVersions,
 } from "../sdk";
 import { Version, Entry } from "../types";
-import { obtainSessionState } from "./state";
+import { obtainSessionState, SessionState } from "./state";
 import { nanoid } from "https://unpkg.com/nanoid@4.0.0/index.browser.js";
 
 export const registerHostPort = (port: chrome.runtime.Port) => {
@@ -19,18 +19,36 @@ export const registerHostPort = (port: chrome.runtime.Port) => {
   sessionState.ports.host = port;
 
   const handleRecordReplay = ({ payload }: ReturnType<typeof recordReplay>) => {
-    const version: Version = {
+    const latestVersion =
+      sessionState.versions[sessionState.versions.length - 1];
+    const nextVersion: Version = {
       id: nanoid(),
       label: `v${sessionState.versions.length}`,
-      entries: payload.entries.map(([action, state], index) => {
-        if (index === 0) return [action, undefined, state];
+      entries: payload.entries.map<Entry>(([id, action, state], index) => {
+        const blame = !latestVersion.entries.some((entry) => entry.id === id);
 
-        return [action, payload.entries[index - 1][1], state];
+        if (index === 0) {
+          return {
+            id,
+            action,
+            prevState: undefined,
+            nextState: state,
+            blame,
+          };
+        }
+
+        return {
+          id,
+          action,
+          prevState: payload.entries[index - 1][2],
+          nextState: state,
+          blame,
+        };
       }),
     };
 
-    sessionState.versions.push(version);
-    sessionState.ports.panel?.postMessage(addVersion(version));
+    sessionState.versions.push(nextVersion);
+    sessionState.ports.panel?.postMessage(addVersion(nextVersion));
   };
 
   const handleRecordDispatch = ({
@@ -39,11 +57,14 @@ export const registerHostPort = (port: chrome.runtime.Port) => {
     const latestVersion =
       sessionState.versions[sessionState.versions.length - 1];
     if (latestVersion) {
-      const entry: Entry = [
-        payload.action,
-        latestVersion.entries[latestVersion.entries.length - 1][2],
-        payload.state,
-      ];
+      const entry: Entry = {
+        id: payload.id,
+        action: payload.action,
+        prevState:
+          latestVersion.entries[latestVersion.entries.length - 1].nextState,
+        nextState: payload.state,
+        blame: false,
+      };
       latestVersion.entries.push(entry);
       sessionState.ports.panel?.postMessage(
         addEntry({ versionID: latestVersion.id, entry })
@@ -52,14 +73,23 @@ export const registerHostPort = (port: chrome.runtime.Port) => {
       const firstVersion: Version = {
         id: nanoid(),
         label: "v0",
-        entries: [[payload.action, undefined, payload.state]],
+        entries: [
+          {
+            id: payload.id,
+            action: payload.action,
+            prevState: undefined,
+            nextState: payload.state,
+            blame: false,
+          },
+        ],
       };
+
       sessionState.versions.push(firstVersion);
       sessionState.ports.panel?.postMessage(addVersion(firstVersion));
     }
   };
 
-  port.onMessage.addListener(function (action: AnyAction) {
+  const messageHandler = (action: AnyAction) => {
     if (recordReplay.match(action)) {
       handleRecordReplay(action);
     } else if (recordDispatch.match(action)) {
@@ -69,17 +99,23 @@ export const registerHostPort = (port: chrome.runtime.Port) => {
     }
 
     port.postMessage(acknowledge());
+  };
+
+  port.onMessage.addListener(messageHandler);
+  port.onDisconnect.addListener(() => {
+    port.onMessage.removeListener(messageHandler);
+    delete sessionState.ports.host;
   });
 };
 
 export const registerPanelPort = (port: chrome.runtime.Port) => {
-  let tabID: string | null = null;
+  let sessionState: SessionState | null = null;
 
-  port.onMessage.addListener(function (action: AnyAction) {
+  const messageHandler = (action: AnyAction) => {
     if (initPanel.match(action)) {
-      tabID = action.payload.tabID;
+      const { tabID } = action.payload;
 
-      const sessionState = obtainSessionState(String(tabID));
+      sessionState = obtainSessionState(String(tabID));
       sessionState.ports.panel = port;
 
       // add all missing versions
@@ -89,5 +125,11 @@ export const registerPanelPort = (port: chrome.runtime.Port) => {
     }
 
     port.postMessage(acknowledge());
+  };
+
+  port.onMessage.addListener(messageHandler);
+  port.onDisconnect.addListener(() => {
+    port.onMessage.removeListener(messageHandler);
+    delete sessionState?.ports.panel;
   });
 };

@@ -11,7 +11,7 @@ const clearActiveEntry = () => {
   if (state.activeEntry === null) return;
 
   const el = document.querySelector(
-    `.${Class.TIMELINE__ENTRY}:nth-of-type(${state.activeEntry + 1})`
+    `.${Class.TIMELINE__ENTRY}.${Class.ACTIVE}`
   );
 
   clearDetails();
@@ -20,19 +20,25 @@ const clearActiveEntry = () => {
 };
 
 const setActiveEntry = (targetEl: HTMLElement, entry: Entry) => {
-  const index = state.activeVersion?.entries.indexOf(entry);
-  if (index === undefined) return;
-
+  const { id } = entry;
   clearActiveEntry();
-  state.activeEntry = index;
+  state.activeEntry = id;
   targetEl.classList.add(Class.ACTIVE);
   renderDetails(entry);
 };
 
 const renderEntry = (entry: Entry) => {
-  const [action] = entry;
+  const { id, action } = entry;
   const el = createElement("li", {
-    classes: [Class.TIMELINE__ENTRY, Class.BORDERED, Class.INTERACTIVE],
+    classes: [
+      Class.TIMELINE__ENTRY,
+      Class.BORDERED,
+      Class.INTERACTIVE,
+      ...(entry.blame ? [Class.BLAME] : []),
+    ],
+    attributes: {
+      "data-id": id,
+    },
     listeners: {
       click: (e) => {
         e.preventDefault();
@@ -49,7 +55,7 @@ const clearActiveVersion = () => {
   if (!state.activeVersion) return null;
 
   const el = document.querySelector(
-    `.${Class.HEADER} > .${Class.VERSION}[data-id="${state.activeVersion.id}"]`
+    `.${Class.HEADER} > .${Class.VERSION}.${Class.ACTIVE}`
   );
 
   clearActiveEntry();
@@ -123,7 +129,11 @@ export const appendEntry = (versionID: string, entry: Entry) => {
     entryEl.classList.remove(Class.NEW)
   );
 
-  timelineEl?.appendChild(entryEl);
+  const timelineEntryListEl = document.querySelector(
+    `.${Class.TIMELINE__ENTRY_LIST}`
+  );
+
+  timelineEntryListEl?.appendChild(entryEl);
 
   entryEl.scrollIntoView();
 };

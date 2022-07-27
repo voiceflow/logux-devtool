@@ -36,46 +36,50 @@ const renderArrayDiff = (diff: DiffResult[]) => {
     return rowEl;
   });
 
-  const containerEl = createElement("div", {
-    classes: [Class.INDENTED],
-    children: diffEls,
-  });
-
-  return createFragment("[", containerEl, "]");
+  return createFragment(
+    "[",
+    createElement("div", {
+      classes: [Class.INDENTED],
+      children: diffEls,
+    }),
+    "]"
+  );
 };
 
 const renderObjectDiff = (diff: Record<typeof $different, Diffable>) => {
-  const containerEl = createElement("div", { classes: [Class.INDENTED] });
-
   const entryEls = Object.entries<Diffable>(diff).map(([key, value]) => {
     const keyEl = createElement("span", { text: `"${key}": ` });
-    const frag = createFragment(keyEl);
-    const rowEl = createElement("div", { children: [frag] });
+    const rowEl = createElement("div", { children: [keyEl] });
 
     if (isAdded(value)) {
       rowEl.classList.add(Class.ADDED);
-      frag.appendChild(
+      rowEl.appendChild(
         createElement("span", {
           text: stringify(getAdded(value)),
         })
       );
     } else if (isRemoved(value)) {
       rowEl.classList.add(Class.REMOVED);
-      frag.appendChild(
+      rowEl.appendChild(
         createElement("span", {
           text: stringify(getRemoved(value)),
         })
       );
-    } else if (isChanged(value)) {
-      frag.appendChild(renderDiff(value));
+    } else {
+      rowEl.appendChild(renderDiff(value));
     }
 
     return rowEl;
   });
 
-  containerEl.appendChild(createFragment(...entryEls));
-
-  return createFragment("{", containerEl, "}");
+  return createFragment(
+    "{",
+    createElement("div", {
+      classes: [Class.INDENTED],
+      children: entryEls,
+    }),
+    "}"
+  );
 };
 
 const renderChanged = (diff: Record<typeof $changed, [Diffable, Diffable]>) => {
@@ -99,6 +103,8 @@ const renderDiff = (diff: DiffResult): HTMLElement | DocumentFragment => {
   if (isChanged(diff)) {
     return renderChanged(diff);
   } else if (isDifferent(diff)) {
+    console.log({ diff });
+
     if (Array.isArray(diff)) return renderArrayDiff(diff);
 
     return renderObjectDiff(diff);

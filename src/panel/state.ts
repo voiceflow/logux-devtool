@@ -2,7 +2,7 @@ import { Version } from "../types";
 
 interface State {
   activeVersion: Version | null;
-  activeEntry: number | null;
+  activeEntry: string | null;
   versions: Partial<Record<string, Version>>;
 }
 

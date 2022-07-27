@@ -32,10 +32,11 @@ const panelAction = actionCreatorFactory(`@@${PANEL_KEY}`);
 
 export const recordReplay = hostAction<{
   tabID: string;
-  entries: [AnyAction, AnyRecord][];
+  entries: [string, AnyAction, AnyRecord][];
 }>("RECORD_REPLAY");
 export const recordDispatch = hostAction<{
   tabID: string;
+  id: string;
   action: AnyAction;
   state: AnyRecord;
 }>("RECORD_DISPATCH");

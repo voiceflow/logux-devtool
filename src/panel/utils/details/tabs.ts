@@ -7,7 +7,7 @@ import renderDiff from "./diff";
 
 const renderTabs = (
   state: { tab: DetailsTab },
-  [action, prevState, nextState]: Entry,
+  { action, prevState, nextState }: Entry,
   updateContent: (content: Node) => void
 ) => {
   const clearTab = () => {

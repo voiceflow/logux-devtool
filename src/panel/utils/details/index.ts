@@ -20,7 +20,7 @@ export const renderDetails = (entry: Entry) => {
     STATE = "state",
   }
 
-  const [action] = entry;
+  const { action } = entry;
   const detailsState: { tab: DetailsTab } = { tab: DetailsTab.ACTION };
 
   const [contentEl, updateContent] = renderContent(action);

@@ -113,6 +113,10 @@ li {
   background-color: var(--warn-color);
 }
 
+.timeline__entry.blame {
+  background-color: var(--good-color);
+}
+
 .details {
   display: flex;
   flex-direction: column;
@@ -136,7 +140,7 @@ li {
   margin-left: 16px;
 }
 
-.tabs__content .added > span {
+.tabs__content .added {
   background-color: var(--good-color);
 }
 
@@ -144,7 +148,7 @@ li {
   background-color: var(--info-color);
 }
 
-.tabs__content .removed > span,
+.tabs__content .removed,
 .tabs__content .prev {
   background-color: var(--bad-color);
   text-decoration: line-through;

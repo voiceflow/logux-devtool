@@ -12,9 +12,9 @@ window.__LOGUX_DEVTOOL__ = {
   recordReplay: (entries) => {
     document.dispatchEvent(createEvent(recordReplay({ tabID, entries })));
   },
-  recordDispatch: (action, state) => {
+  recordDispatch: (id, action, state) => {
     document.dispatchEvent(
-      createEvent(recordDispatch({ tabID, action, state }))
+      createEvent(recordDispatch({ tabID, id, action, state }))
     );
   },
 };

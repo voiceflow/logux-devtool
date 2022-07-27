@@ -1,7 +1,7 @@
 interface Window {
   __LOGUX_DEVTOOL__: {
-    recordReplay: (entries: [AnyAction, AnyRecord][]) => void;
-    recordDispatch: (action: AnyAction, state: AnyRecord) => void;
+    recordReplay: (entries: [string, AnyAction, AnyRecord][]) => void;
+    recordDispatch: (id: string, action: AnyAction, state: AnyRecord) => void;
   };
 }
 

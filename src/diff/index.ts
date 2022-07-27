@@ -48,42 +48,37 @@ const arrayGuard = (_value: any, type: Type): _value is Diffable[] =>
 const objectGuard = (_value: any, type: Type): _value is DiffableObject =>
   type === Type.OBJECT;
 
+const zip = <T>(lhs: T[], rhs: T[]): [T | undefined, T | undefined][] => {
+  const length = Math.max(lhs.length, rhs.length);
+
+  return Array.from({ length }).map((_, index) => [lhs[index], rhs[index]]);
+};
+
 export function arrayDiff(prev: Diffable[], next: Diffable[]): DiffResult {
   const prevEmpty = !prev.length;
   const nextEmpty = !next.length;
+  const length = Math.max(prev.length, next.length);
 
   if (prevEmpty && nextEmpty) return [];
   if (prevEmpty) return tagDifferent(next.map(tagAdded));
   if (nextEmpty) return tagDifferent(prev.map(tagRemoved));
 
   let hasChange = false;
-  if (prev.length >= next.length) {
-    const root = prev.map((prevValue, index) => {
-      if (index >= next.length) {
-        hasChange = true;
-        return tagRemoved(prevValue);
-      }
-
-      const result = diff(prevValue, next[index]);
+  const root = Array.from({ length }).map((_, index) => {
+    if (index >= prev.length) {
+      hasChange = true;
+      return tagAdded(next[index]);
+    } else if (index >= next.length) {
+      hasChange = true;
+      return tagRemoved(prev[index]);
+    } else {
+      const result = diff(prev[index], next[index]);
       hasChange ||= isDifferent(result);
       return result;
-    });
+    }
+  });
 
-    return hasChange ? tagDifferent(root) : root;
-  } else {
-    const root = next.map((nextValue, index) => {
-      if (index >= next.length) {
-        hasChange = true;
-        return tagAdded(nextValue);
-      }
-
-      const result = diff(prev[index], nextValue);
-      hasChange ||= isDifferent(result);
-      return result;
-    });
-
-    return hasChange ? tagDifferent(root) : root;
-  }
+  return hasChange ? tagDifferent(root) : root;
 }
 
 export function objectDiff(
