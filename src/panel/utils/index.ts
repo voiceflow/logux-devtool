@@ -4,8 +4,15 @@ import { Class } from "../constants";
 import { renderDetails, clearDetails } from "./details/index";
 import { createElement, createFragment } from "../../utils";
 
-const headerEl = document.querySelector(`.${Class.HEADER}`);
+const versionListEl = document.querySelector(`.${Class.VERSION_LIST}`);
+const versionListClearEl = document.querySelector(
+  `.${Class.VERSION_LIST__CLEAR}`
+);
 const timelineEl = document.querySelector(`.${Class.TIMELINE}`);
+
+versionListClearEl?.addEventListener("click", () => {
+  versionListEl?.replaceChildren();
+});
 
 const clearActiveEntry = () => {
   if (state.activeEntry === null) return;
@@ -55,7 +62,7 @@ const clearActiveVersion = () => {
   if (!state.activeVersion) return null;
 
   const el = document.querySelector(
-    `.${Class.HEADER} > .${Class.VERSION}.${Class.ACTIVE}`
+    `.${Class.VERSION_LIST} > .${Class.VERSION}.${Class.ACTIVE}`
   );
 
   clearActiveEntry();
@@ -112,7 +119,7 @@ const renderVersion = (version: Version) => {
 export const appendVersions = (...versions: Version[]) => {
   versions.forEach((version) => (state.versions[version.id] = version));
 
-  headerEl?.appendChild(createFragment(...versions.map(renderVersion)));
+  versionListEl?.appendChild(createFragment(...versions.map(renderVersion)));
 };
 
 export const appendEntry = (versionID: string, entry: Entry) => {

@@ -4,9 +4,10 @@ import { createElement } from "../../../utils";
 import { Class } from "../../constants";
 import { DetailsTab } from "./constants";
 import renderDiff from "./diff";
+import { DetailState } from "./types";
 
 const renderTabs = (
-  state: { tab: DetailsTab },
+  state: DetailState,
   { action, prevState, nextState }: Entry,
   updateContent: (content: Node) => void
 ) => {
@@ -18,17 +19,28 @@ const renderTabs = (
     el?.classList.remove(Class.ACTIVE);
   };
 
-  const setTab = (targetEl: HTMLElement, tab: DetailsTab, content: Node) => {
+  const setTab = (
+    targetEl: HTMLElement,
+    tab: DetailsTab,
+    value: AnyRecord,
+    content: Node
+  ) => {
     if (tab === state.tab) return;
 
     clearTab();
     state.tab = tab;
+    state.content = value;
     targetEl.classList.add(Class.ACTIVE);
 
     updateContent(content);
   };
 
-  const renderTab = (tab: DetailsTab, content: Node, active = false) => {
+  const renderTab = (
+    tab: DetailsTab,
+    value: AnyRecord,
+    content: Node,
+    active = false
+  ) => {
     const el = createElement("button", {
       classes: [
         Class.TABS__TAB,
@@ -41,7 +53,7 @@ const renderTabs = (
       },
       listeners: {
         click: () => {
-          setTab(el, tab, content);
+          setTab(el, tab, value, content);
         },
       },
       text: tab.toUpperCase(),
@@ -53,8 +65,12 @@ const renderTabs = (
   return createElement("nav", {
     classes: [Class.TABS],
     children: [
-      renderTab(DetailsTab.ACTION, renderDiff(action), true),
-      renderTab(DetailsTab.STATE, renderDiff(diff(prevState, nextState))),
+      renderTab(DetailsTab.ACTION, action, renderDiff(action), true),
+      renderTab(
+        DetailsTab.STATE,
+        nextState,
+        renderDiff(diff(prevState, nextState))
+      ),
     ],
   });
 };

@@ -17,7 +17,14 @@ export enum Class {
 
   // components
   HEADER = "header",
+
+  // details
   DETAILS = "details",
+  DETAILS__LOG = "details__log",
+
+  // version list
+  VERSION_LIST = "version-list",
+  VERSION_LIST__CLEAR = "version-list__clear",
   VERSION = "version",
 
   // timeline

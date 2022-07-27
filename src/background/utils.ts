@@ -2,6 +2,7 @@ import {
   acknowledge,
   addEntry,
   addVersion,
+  logValue,
   initPanel,
   recordDispatch,
   recordReplay,
@@ -111,15 +112,25 @@ export const registerHostPort = (port: chrome.runtime.Port) => {
 export const registerPanelPort = (port: chrome.runtime.Port) => {
   let sessionState: SessionState | null = null;
 
+  const handleInitPanel = (action: ReturnType<typeof initPanel>) => {
+    const { tabID } = action.payload;
+
+    sessionState = obtainSessionState(String(tabID));
+    sessionState.ports.panel = port;
+
+    // add all missing versions
+    port.postMessage(replaceVersions(sessionState.versions));
+  };
+
+  const handleLogValue = (action: ReturnType<typeof logValue>) => {
+    sessionState?.ports.host?.postMessage(action);
+  };
+
   const messageHandler = (action: AnyAction) => {
     if (initPanel.match(action)) {
-      const { tabID } = action.payload;
-
-      sessionState = obtainSessionState(String(tabID));
-      sessionState.ports.panel = port;
-
-      // add all missing versions
-      port.postMessage(replaceVersions(sessionState.versions));
+      handleInitPanel(action);
+    } else if (logValue.match(action)) {
+      handleLogValue(action);
     } else {
       console.warn("unexpected panel message");
     }

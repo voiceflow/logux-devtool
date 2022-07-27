@@ -7,6 +7,7 @@
   --good-color: rgba(10, 71, 16, 0.75);
   --bad-color: rgba(126, 49, 49, 0.75);
   --info-color: rgba(12, 70, 88, 0.75);
+  --small-space: 16px;
   --med-space: 32px;
 }
 
@@ -56,6 +57,10 @@ li {
 /* components */
 
 .header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--small-space);
   padding-bottom: 16px;
   overflow-x: scroll;
 }
@@ -68,6 +73,19 @@ li {
 .version.active,
 .version:hover {
   color: var(--highlight-color);
+}
+
+.version-list__clear {
+  position: absolute;
+  right: 0;
+  height: inherit;
+  border: 0;
+  color: var(--primary-color);
+  background: none;
+}
+
+.version-list__clear:hover {
+  cursor: pointer;
 }
 
 .overview {
@@ -118,10 +136,28 @@ li {
 }
 
 .details {
+  position: relative;
   display: flex;
   flex-direction: column;
   flex: 2;
   overflow: hidden;
+}
+
+.details__log {
+  position: absolute;
+  top: calc(var(--med-space) + var(--small-space));
+  right: var(--small-space);
+  border: 0;
+  background: var(--secondary-color);
+  color: var(--highlight-color);
+}
+
+.details__log:hover {
+  cursor: pointer;
+}
+
+.details__log:active {
+  background: none;
 }
 
 .tabs__tab {

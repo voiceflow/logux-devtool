@@ -1,10 +1,8 @@
-import { PANEL_KEY } from "../constants";
 import { addEntry, addVersion, initPanel, replaceVersions } from "../sdk";
 import { appendVersions, appendEntry } from "./utils/index";
+import client from "./client";
 
-const port = chrome.runtime.connect({ name: PANEL_KEY });
-
-port.onMessage.addListener((action: AnyAction) => {
+client.onMessage((action: AnyAction) => {
   if (addVersion.match(action)) {
     appendVersions(action.payload);
   } else if (addEntry.match(action)) {
@@ -14,6 +12,6 @@ port.onMessage.addListener((action: AnyAction) => {
   }
 });
 
-port.postMessage(
+client.sendMessage(
   initPanel({ tabID: String(chrome.devtools.inspectedWindow.tabId) })
 );

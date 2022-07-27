@@ -54,3 +54,4 @@ export const addEntry = serviceAction<{ versionID: string; entry: Entry }>(
 /* panel actions */
 
 export const initPanel = panelAction<{ tabID: string }>("INIT");
+export const logValue = panelAction<{ value: any }>("LOG_VALUE");
