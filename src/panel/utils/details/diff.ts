@@ -11,19 +11,17 @@ import {
   $different,
   $changed,
 } from "../../../diff/index";
-import { createFragment } from "../../../utils";
+import { createElement, createFragment } from "../../../utils";
 import { Class } from "../../constants";
 
 const NBSP = "\u00A0";
 
-const stringify = (value: Diffable) =>
+export const stringify = (value: Diffable) =>
   JSON.stringify(value, null, NBSP.repeat(4));
 
 const renderArrayDiff = (diff: DiffResult[]) => {
-  const containerEl = document.createElement("div");
-
   const diffEls = diff.map((item) => {
-    const rowEl = document.createElement("div");
+    const rowEl = createElement("div");
 
     if (isAdded(item)) {
       rowEl.classList.add(Class.ADDED);
@@ -38,37 +36,39 @@ const renderArrayDiff = (diff: DiffResult[]) => {
     return rowEl;
   });
 
-  containerEl.classList.add(Class.INDENTED);
-  containerEl.appendChild(createFragment(...diffEls));
+  const containerEl = createElement("div", {
+    classes: [Class.INDENTED],
+    children: diffEls,
+  });
 
   return createFragment("[", containerEl, "]");
 };
 
 const renderObjectDiff = (diff: Record<typeof $different, Diffable>) => {
-  const containerEl = document.createElement("div");
-  containerEl.classList.add(Class.INDENTED);
+  const containerEl = createElement("div", { classes: [Class.INDENTED] });
 
   const entryEls = Object.entries<Diffable>(diff).map(([key, value]) => {
-    const rowEl = document.createElement("div");
-    const keyEl = document.createElement("span");
+    const keyEl = createElement("span", { text: `"${key}": ` });
     const frag = createFragment(keyEl);
+    const rowEl = createElement("div", { children: [frag] });
 
     if (isAdded(value)) {
-      const valueEl = document.createElement("span");
       rowEl.classList.add(Class.ADDED);
-      valueEl.innerText = stringify(getAdded(value));
-      frag.appendChild(valueEl);
+      frag.appendChild(
+        createElement("span", {
+          text: stringify(getAdded(value)),
+        })
+      );
     } else if (isRemoved(value)) {
-      const valueEl = document.createElement("span");
       rowEl.classList.add(Class.REMOVED);
-      valueEl.innerText = stringify(getRemoved(value));
-      frag.appendChild(valueEl);
+      frag.appendChild(
+        createElement("span", {
+          text: stringify(getRemoved(value)),
+        })
+      );
     } else if (isChanged(value)) {
       frag.appendChild(renderDiff(value));
     }
-
-    keyEl.innerText = `"${key}": `;
-    rowEl.appendChild(frag);
 
     return rowEl;
   });
@@ -80,20 +80,19 @@ const renderObjectDiff = (diff: Record<typeof $different, Diffable>) => {
 
 const renderChanged = (diff: Record<typeof $changed, [Diffable, Diffable]>) => {
   const [prev, next] = getChanged(diff);
-  const prevEl = document.createElement("span");
-  const nextEl = document.createElement("span");
+  const prevEl = createElement("span", {
+    classes: [Class.PREV],
+    text: stringify(prev),
+  });
+  const nextEl = createElement("span", {
+    classes: [Class.NEXT],
+    text: stringify(next),
+  });
 
-  prevEl.classList.add("prev");
-  nextEl.classList.add("next");
-  prevEl.innerText = stringify(prev);
-  nextEl.innerText = stringify(next);
-
-  const el = document.createElement("div");
-
-  el.classList.add(Class.CHANGED);
-  el.appendChild(createFragment(prevEl, nextEl));
-
-  return el;
+  return createElement("div", {
+    classes: [Class.CHANGED],
+    children: [prevEl, " ", nextEl],
+  });
 };
 
 const renderDiff = (diff: DiffResult): HTMLElement | DocumentFragment => {
@@ -104,12 +103,10 @@ const renderDiff = (diff: DiffResult): HTMLElement | DocumentFragment => {
 
     return renderObjectDiff(diff);
   } else {
-    const el = document.createElement("span");
-
-    el.classList.add(Class.UNCHANGED);
-    el.innerText = stringify(diff);
-
-    return el;
+    return createElement("span", {
+      classes: [Class.UNCHANGED],
+      text: stringify(diff),
+    });
   }
 };
 

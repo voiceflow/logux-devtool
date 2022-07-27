@@ -30,13 +30,6 @@ const panelAction = actionCreatorFactory(`@@${PANEL_KEY}`);
 
 /* host actions */
 
-export const logAdd = hostAction<{ tabID: string; message: AnyAction }>(
-  "LOG_ADD"
-);
-export const replayLog = hostAction<{ tabID: string; actions: AnyAction[] }>(
-  "REPLAY_LOG"
-);
-
 export const recordReplay = hostAction<{
   tabID: string;
   entries: [AnyAction, AnyRecord][];

@@ -8,6 +8,8 @@ export enum Class {
   ADDED = "added",
   REMOVED = "removed",
   CHANGED = "changed",
+  PREV = "prev",
+  NEXT = "next",
   UNCHANGED = "unchanged",
 
   // components

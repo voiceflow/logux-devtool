@@ -1,15 +1,14 @@
+import { diff } from "../../../diff/index";
 import { Entry } from "../../../types";
+import { createElement } from "../../../utils";
 import { Class } from "../../constants";
-
-enum DetailsTab {
-  ACTION = "action",
-  STATE = "state",
-}
+import { DetailsTab } from "./constants";
+import renderDiff, { stringify } from "./diff";
 
 const renderTabs = (
   state: { tab: DetailsTab },
-  [action, actionState]: Entry,
-  updateContent: (value: AnyRecord) => void
+  [action, prevState, nextState]: Entry,
+  updateContent: (content: Node) => void
 ) => {
   const clearTab = () => {
     const el = document.querySelector(
@@ -19,43 +18,44 @@ const renderTabs = (
     el?.classList.remove(Class.ACTIVE);
   };
 
-  const setTab = (
-    targetEl: HTMLElement,
-    tab: DetailsTab,
-    content: AnyRecord
-  ) => {
+  const setTab = (targetEl: HTMLElement, tab: DetailsTab, content: Node) => {
     if (tab === state.tab) return;
 
     clearTab();
     state.tab = tab;
     targetEl.classList.add(Class.ACTIVE);
+
     updateContent(content);
   };
 
-  const renderTab = (tab: DetailsTab, content: AnyRecord, active = false) => {
-    const el = document.createElement("button");
-
-    el.classList.add(Class.TABS__TAB);
-    el.setAttribute("data-tab", tab);
-    el.addEventListener("click", () => setTab(el, tab, content));
-    el.innerText = tab;
-
-    if (active) {
-      el.classList.add(Class.ACTIVE);
-    }
+  const renderTab = (tab: DetailsTab, content: Node, active = false) => {
+    const el = createElement("button", {
+      classes: [Class.TABS__TAB, ...(active ? [Class.ACTIVE] : [])],
+      attributes: {
+        "data-tab": tab,
+      },
+      listeners: {
+        click: () => {
+          setTab(el, tab, content);
+        },
+      },
+      text: tab,
+    });
 
     return el;
   };
 
-  const el = document.createElement("nav");
-  const frag = document.createDocumentFragment();
-
-  el.classList.add(Class.TABS);
-  frag.appendChild(renderTab(DetailsTab.ACTION, action, true));
-  frag.appendChild(renderTab(DetailsTab.STATE, actionState));
-  el.appendChild(frag);
-
-  return el;
+  return createElement("nav", {
+    classes: [Class.TABS],
+    children: [
+      renderTab(
+        DetailsTab.ACTION,
+        document.createTextNode(stringify(action)),
+        true
+      ),
+      renderTab(DetailsTab.STATE, renderDiff(diff(prevState, nextState))),
+    ],
+  });
 };
 
 export default renderTabs;

@@ -3,11 +3,9 @@ import {
   addEntry,
   addVersion,
   initPanel,
-  logAdd,
   recordDispatch,
   recordReplay,
   replaceVersions,
-  replayLog,
 } from "../sdk";
 import { Version, Entry } from "../types";
 import { obtainSessionState } from "./state";
@@ -20,33 +18,15 @@ export const registerHostPort = (port: chrome.runtime.Port) => {
   const sessionState = obtainSessionState(String(tabID));
   sessionState.ports.host = port;
 
-  const handleLogAdd = ({ payload }: ReturnType<typeof logAdd>) => {
-    const version: Version = {
-      id: nanoid(),
-      label: `v${sessionState.versions.length + 1}`,
-      entries: [[payload.message, { who: "knows" }]],
-    };
-
-    sessionState.versions.push(version);
-    sessionState.ports.panel?.postMessage(addVersion(version));
-  };
-
-  const handleReplayLog = ({ payload }: ReturnType<typeof replayLog>) => {
-    const version: Version = {
-      id: nanoid(),
-      label: `v${sessionState.versions.length + 1}`,
-      entries: payload.actions.map((action) => [action, { who: "knows" }]),
-    };
-
-    sessionState.versions.push(version);
-    sessionState.ports.panel?.postMessage(addVersion(version));
-  };
-
   const handleRecordReplay = ({ payload }: ReturnType<typeof recordReplay>) => {
     const version: Version = {
       id: nanoid(),
-      label: `v${sessionState.versions.length + 1}`,
-      entries: payload.entries,
+      label: `v${sessionState.versions.length}`,
+      entries: payload.entries.map(([action, state], index) => {
+        if (index === 0) return [action, undefined, state];
+
+        return [action, payload.entries[index - 1][1], state];
+      }),
     };
 
     sessionState.versions.push(version);
@@ -56,24 +36,31 @@ export const registerHostPort = (port: chrome.runtime.Port) => {
   const handleRecordDispatch = ({
     payload,
   }: ReturnType<typeof recordDispatch>) => {
-    const entry: Entry = [payload.action, payload.state];
-
     const latestVersion =
       sessionState.versions[sessionState.versions.length - 1];
-    if (!latestVersion) return;
-
-    latestVersion.entries.push(entry);
-    sessionState.ports.panel?.postMessage(
-      addEntry({ versionID: latestVersion.id, entry })
-    );
+    if (latestVersion) {
+      const entry: Entry = [
+        payload.action,
+        latestVersion.entries[latestVersion.entries.length - 1][2],
+        payload.state,
+      ];
+      latestVersion.entries.push(entry);
+      sessionState.ports.panel?.postMessage(
+        addEntry({ versionID: latestVersion.id, entry })
+      );
+    } else {
+      const firstVersion: Version = {
+        id: nanoid(),
+        label: "v0",
+        entries: [[payload.action, undefined, payload.state]],
+      };
+      sessionState.versions.push(firstVersion);
+      sessionState.ports.panel?.postMessage(addVersion(firstVersion));
+    }
   };
 
   port.onMessage.addListener(function (action: AnyAction) {
-    if (logAdd.match(action)) {
-      handleLogAdd(action);
-    } else if (replayLog.match(action)) {
-      handleReplayLog(action);
-    } else if (recordReplay.match(action)) {
+    if (recordReplay.match(action)) {
       handleRecordReplay(action);
     } else if (recordDispatch.match(action)) {
       handleRecordDispatch(action);

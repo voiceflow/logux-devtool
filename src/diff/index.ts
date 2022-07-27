@@ -42,7 +42,6 @@ const getType = (value: any) => {
   }
 };
 
-const isDeep = (type: Type) => type === Type.UNDEFINED || type === Type.NULL;
 const isNullish = (type: Type) => type === Type.UNDEFINED || type === Type.NULL;
 const arrayGuard = (_value: any, type: Type): _value is Diffable[] =>
   type === Type.ARRAY;

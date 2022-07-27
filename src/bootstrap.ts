@@ -1,4 +1,4 @@
-import { logAdd, recordDispatch, recordReplay, replayLog } from "./sdk";
+import { recordDispatch, recordReplay } from "./sdk";
 import { nanoid } from "https://unpkg.com/nanoid@4.0.0/index.browser.js";
 
 const tabID = nanoid();
@@ -9,13 +9,6 @@ const createEvent = (action: AnyAction) =>
   });
 
 window.__LOGUX_DEVTOOL__ = {
-  logAdd: (message) => {
-    document.dispatchEvent(createEvent(logAdd({ tabID, message })));
-  },
-  replayLog: (actions) => {
-    document.dispatchEvent(createEvent(replayLog({ tabID, actions })));
-  },
-
   recordReplay: (entries) => {
     document.dispatchEvent(createEvent(recordReplay({ tabID, entries })));
   },

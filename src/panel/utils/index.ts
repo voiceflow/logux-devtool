@@ -2,7 +2,7 @@ import { Entry, Version } from "../../types";
 import state from "../state";
 import { Class } from "../constants";
 import { renderDetails, clearDetails } from "./details/index";
-import { createFragment } from "../../utils";
+import { createElement, createFragment } from "../../utils";
 
 const headerEl = document.querySelector(`.${Class.HEADER}`);
 const timelineEl = document.querySelector(`.${Class.TIMELINE}`);
@@ -31,14 +31,16 @@ const setActiveEntry = (targetEl: HTMLElement, entry: Entry) => {
 
 const renderEntry = (entry: Entry) => {
   const [action] = entry;
-  const el = document.createElement("li");
-
-  el.classList.add(Class.TIMELINE__ENTRY);
-  el.addEventListener("click", (e) => {
-    e.preventDefault();
-    setActiveEntry(el, entry);
+  const el = createElement("li", {
+    classes: [Class.TIMELINE__ENTRY],
+    listeners: {
+      click: (e) => {
+        e.preventDefault();
+        setActiveEntry(el, entry);
+      },
+    },
+    text: action.type,
   });
-  el.innerText = action.type;
 
   return el;
 };
@@ -67,18 +69,22 @@ const setActiveVersion = (targetEl: HTMLElement, version: Version) => {
 };
 
 const renderVersion = (version: Version) => {
-  const el = document.createElement("a");
+  const el = createElement("a", {
+    classes: [Class.VERSION],
+    attributes: {
+      href: `?versionID=${version.id}`,
+      "data-id": version.id,
+    },
+    listeners: {
+      click: (e) => {
+        if (e.ctrlKey || e.metaKey) return;
 
-  el.classList.add(Class.VERSION);
-  el.setAttribute("href", `?versionID=${version.id}`);
-  el.setAttribute("data-id", version.id);
-  el.addEventListener("click", (e) => {
-    if (e.ctrlKey || e.metaKey) return;
-
-    e.preventDefault();
-    setActiveVersion(el, version);
+        e.preventDefault();
+        setActiveVersion(el, version);
+      },
+    },
+    text: version.label,
   });
-  el.innerText = version.label;
 
   return el;
 };
