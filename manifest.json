@@ -14,13 +14,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://*.voiceflow.com/*", "https://*.test.e2e/*"],
+      "matches": ["https://*/*"],
       "js": ["scripts/inject.js"]
     }
   ],
   "web_accessible_resources": [
     {
-      "matches": ["https://*.voiceflow.com/*", "https://*.test.e2e/*"],
+      "matches": ["https://*/*"],
       "resources": [
         "scripts/constants.js",
         "scripts/sdk.js",
