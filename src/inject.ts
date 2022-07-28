@@ -22,17 +22,20 @@ const bindPort = (port: chrome.runtime.Port) => {
     );
   };
 
-  document.addEventListener(LOGUX_EVENT, (event) => {
+  const eventHandler = (event: Event) => {
     const {
       detail: { action },
     } = event as CustomEvent<{ action: AnyAction }>;
 
     port.postMessage(action);
-  });
+  };
+
+  document.addEventListener(LOGUX_EVENT, eventHandler);
 
   port.onMessage.addListener(messageHandler);
   port.onDisconnect.addListener(() => {
     port.onMessage.removeListener(messageHandler);
+    document.removeEventListener(LOGUX_EVENT, eventHandler);
   });
 };
 

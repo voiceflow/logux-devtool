@@ -103,8 +103,6 @@ const renderDiff = (diff: DiffResult): HTMLElement | DocumentFragment => {
   if (isChanged(diff)) {
     return renderChanged(diff);
   } else if (isDifferent(diff)) {
-    console.log({ diff });
-
     if (Array.isArray(diff)) return renderArrayDiff(diff);
 
     return renderObjectDiff(diff);
