@@ -38,3 +38,6 @@ record a set of replayed actions with their new states
 
 ## Screenshots
 
+<img width="1727" alt="Screen Shot 2022-07-28 at 4 12 46 AM" src="https://user-images.githubusercontent.com/3784470/181456155-4f8ce853-b772-4d7a-a5db-5fddd5b5cb34.png">
+
+
